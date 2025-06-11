@@ -75,16 +75,15 @@ class Server:
             )
             return
 
-        logging.error("payload: {:02x}".format(buf))
-        # fmt = f">{dim}f"
-        # values = list(struct.unpack(fmt, buf))
-        a = int.from_bytes(buf[0:4], byteorder="big")
-        b = int.from_bytes(buf[4:8], byteorder="big")
-        c = int.from_bytes(buf[8:12], byteorder="big")
-        d = int.from_bytes(buf[12:16], byteorder="big")
-        e = int.from_bytes(buf[16:20], byteorder="big")
-        values = [a, b, c, d, e]
+        fmt = f">{dim}f"
+        values = list(struct.unpack(fmt, buf))
         logging.info(f"[vec{vector_id}] Received values: {values}")
+        # a = int.from_bytes(buf[0:4], byteorder="big")
+        # b = int.from_bytes(buf[4:8], byteorder="big")
+        # c = int.from_bytes(buf[8:12], byteorder="big")
+        # d = int.from_bytes(buf[12:16], byteorder="big")
+        # e = int.from_bytes(buf[16:20], byteorder="big")
+        # values = [a, b, c, d, e]
 
         model_name = f"{self.name}_vec{vector_id}"
         endpoint = "training" if is_training else "testing"
@@ -116,7 +115,6 @@ class Server:
                     return
 
                 payload = client.recv(dim * 4)
-                logging.error("payload: {:02x}".format(payload))
                 if len(payload) != dim * 4:
                     logging.error("Incomplete payload")
                     return

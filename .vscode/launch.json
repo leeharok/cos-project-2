@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/harok/Desktop/2025/COS/workspace/cos-project-2-test/edge",
+      "program": "/Users/harok/Desktop/2025/COS/workspace/cos-project-2-test/edge/build/Debug/outDebug"
+    }
+  ]
+}

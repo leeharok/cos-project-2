@@ -11,7 +11,7 @@ using namespace std;
 ProcessManager::ProcessManager()
 {
   this->num = 0;
-  this->vector_id = 2; // 기본은 5D
+  this->vector_id = 2; 
 }
 
 void ProcessManager::init()
@@ -23,43 +23,53 @@ void ProcessManager::setVectorID(int id)
   this->vector_id = id;
 }
 
+// Processes dataset information and returns a serialized byte buffer according to vector_id(0, 1, 2)
 uint8_t *ProcessManager::processData(DataSet *ds, int *dlen)
 {
-  uint8_t *ret = (uint8_t *)malloc(BUFLEN);
-  memset(ret, 0, BUFLEN);
-  *dlen = 0;
-  uint8_t *p = ret;
+  uint8_t *ret = (uint8_t *)malloc(BUFLEN);  // Allocate memory for output buffer
+  memset(ret, 0, BUFLEN);                    // Initialize buffer to zero
+  *dlen = 0;                                 // Initialize data length to zero
+  uint8_t *p = ret;                          // Pointer to the current write position in the buffer
 
+  // Retrieve temperature and humidity data from the dataset
   TemperatureData *tdata = ds->getTemperatureData();
   HumidityData *hdata = ds->getHumidityData();
+
+  // Get the number of house entries in the dataset
   int num = ds->getNumHouseData();
 
+  // Declare timestamp and time structure
   time_t ts;
   struct tm *tm;
   float month, year;
-  ts = ds->getTimestamp();
-  tm = localtime(&ts);
-  month = tm->tm_mon + 1;
-  year = tm->tm_year + 1900;
 
-  float max_temp = tdata->getMax();
-  float max_humid = hdata->getMax();
-  float avg_humid = hdata->getValue();
+  ts = ds->getTimestamp();              // Get the dataset's timestamp
+  tm = localtime(&ts);                  // Convert timestamp to local time (struct tm)
+  month = tm->tm_mon + 1;               // Extract month (tm_mon is 0-based, so add 1)
+  year = tm->tm_year + 1900;            // Extract year (tm_year is years since 1900)
 
-  float power_sum = 0.0;
+  float max_temp = tdata->getMax();     // Retrieve max temperature from temperature data
+  float max_humid = hdata->getMax();    // Retrieve max humidity from humidity data
+  float avg_humid = hdata->getValue();  // Retrieve average humidity
+
+  // Initialize power and humidity sums
+  float power_sum = 0.0;                
   float humidity_sum = 0.0;
 
+   // Debug output of month and year
   printf("month: %f, year: %f\n", month, year);
 
+  // Sum power consumption across all houses
   for (int i = 0; i < num; ++i) {
     HouseData *house = ds->getHouseData(i);
     PowerData *pdata = house->getPowerData();
     power_sum += pdata->getValue();
   }
   
+  // Compute average power consumption
   float avg_power = power_sum / num;
 
-  // === 벡터 분기 처리 ===
+  // === Branch based on vector ID ===
   if (vector_id == 2) {
     // [max_humid, max_temp, month, year, avg_power]
     VAR_TO_MEM_4BYTES_BIG_ENDIAN(*((uint32_t *)&max_humid), p); *dlen += 4;
@@ -81,8 +91,9 @@ uint8_t *ProcessManager::processData(DataSet *ds, int *dlen)
     VAR_TO_MEM_4BYTES_BIG_ENDIAN(*((uint32_t *)&avg_power), p);  *dlen += 4;
 
   } else {
+    // Invalid vector ID; print warning
     cout << "[!] Unknown vector ID: " << vector_id << endl;
   }
-
+  // Return the serialized byte buffer
   return ret;
 }

@@ -12,6 +12,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+  // Initialize variables for data handling
   DataReceiver *dr;
   DataSet *ds;
   HouseData *house;
@@ -26,10 +27,11 @@ int main(int argc, char *argv[])
   unsigned char buf[BUFLEN];
   unsigned char *p;
 
+  // Set initial timestamp (January 1, 2021 00:00:00 UTC)
   curr = 1609459200;
   dr = new DataReceiver();
   ds = dr->getDataSet(curr);
-  
+
   // 1. Write a statement to get the timestamp value to 'ts' and print out the value (please refer to dataset.h)
   ts = ds->getTimestamp();
   cout << "timestamp: " << ts << endl;
@@ -38,27 +40,27 @@ int main(int argc, char *argv[])
   num = ds->getNumHouseData();
   cout << "# of house data: " << num << endl;
 
-  // 3. Write a statement to get the first house data to 'house' (please refer to dataset.h) 
+  // 3. Write a statement to get the first house data to 'house' (please refer to dataset.h)
   house = ds->getHouseData(0);
-  
+
   // Write a statement to get the 10th house data to 'house' (dataset.h)
   house = ds->getHouseData(9);
-  
+
   // Get the power data to 'pdata' (house_data.h)
   pdata = house->getPowerData();
-  
+
   // Get the daily power value to 'power' and print out the value (power_data.h)
   power = pdata->getValue();
   cout << "Power: " << power << endl;
-  
+
   // Explicitly cast the type from double to int and assign it to 'tmp', and print out the value
   tmp = (int)pdata->getValue();
   cout << "Power (casted): " << tmp << endl;
-  
-  // Compute the value averaged over all the power data by using 'sum_power' and 'num', 
+
+  // Compute the value averaged over all the power data by using 'sum_power' and 'num',
   // assign the average value to 'avg_power', and print out the value
   sum_power = 0;
-  for (int i=0; i<num; i++)
+  for (int i = 0; i < num; i++)
   {
     house = ds->getHouseData(i);
     pdata = house->getPowerData();
@@ -66,10 +68,10 @@ int main(int argc, char *argv[])
   }
   avg_power = sum_power / num;
   cout << "Power (avg): " << avg_power << endl;
-  
-  // Find the maximum value among all the power data 
+
+  // Find the maximum value among all the power data
   max_power = -1;
-  for (int i=0; i<num; i++)
+  for (int i = 0; i < num; i++)
   {
     house = ds->getHouseData(i);
     pdata = house->getPowerData();
@@ -79,10 +81,10 @@ int main(int argc, char *argv[])
       max_power = power;
   }
   cout << "Power (max): " << max_power << endl;
-  
+
   // Find the minimum value among all the power data
   min_power = 10000;
-  for (int i=0; i<num; i++)
+  for (int i = 0; i < num; i++)
   {
     house = ds->getHouseData(i);
     pdata = house->getPowerData();
@@ -95,38 +97,38 @@ int main(int argc, char *argv[])
 
   // 4. Write a statement to get the temperature data to 'tdata' (dataset.h)
   tdata = ds->getTemperatureData();
-  
+
   // Get the maximum value of the daily temperature (temperature_data.h)
   max_temp = tdata->getMax();
   cout << "Temperature (max): " << max_temp << endl;
-  
+
   // Get the average value of the daily temperature (temperature_data.h)
   avg_temp = tdata->getValue();
   cout << "Temperature (avg): " << avg_temp << endl;
-  
+
   // Get the minimum value of the daily temperature (temperature_data.h)
   min_temp = tdata->getMin();
   cout << "Temperature (min): " << min_temp << endl;
-  
+
   // Explicitly cast the type of the maximum value from double to int, assign the resultant value to 'tmp', and print it out
   tmp = (int)tdata->getMax();
   cout << "Temperature (max, casted): " << tmp << endl;
 
   // 5. Write a statement to get the humidity data to 'hdata' (dataset.h)
   hdata = ds->getHumidityData();
-  
+
   // Get the maximum value of the daily humidity (humidity_data.h)
   max_humid = hdata->getMax();
   cout << "Humidity (max): " << max_humid << endl;
-  
+
   // Get the average value of the daily humidity (humidity_data.h)
   avg_humid = hdata->getValue();
   cout << "Humidity (avg): " << avg_humid << endl;
-  
+
   // Get the minimum value of the daily humidity (humidity_data.h)
   min_humid = hdata->getMin();
   cout << "Humidity (min): " << min_humid << endl;
-  
+
   // Explicitly cast the type of the minimum value from double to int, assign the resultant value to 'tmp', and print it out
   tmp = (int)hdata->getMin();
   cout << "Humidity (min, casted): " << tmp << endl;
@@ -148,5 +150,5 @@ int main(int argc, char *argv[])
   tmp = p - buf;
   PRINT_MEM(buf, tmp);
 
-	return 0;
+  return 0;
 }
